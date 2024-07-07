@@ -5,6 +5,7 @@ function UploadMeme() {
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [description, setDescription] = useState('');
+  const [extractedText, setExtractedText] = useState('');
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -17,7 +18,7 @@ function UploadMeme() {
     reader.readAsDataURL(selectedFile);
   };
 
-  const getDescription = async () => {
+  const getDescriptionAndText = async () => {
     if (!file) {
       alert('Please select an image first.');
       return;
@@ -31,22 +32,10 @@ function UploadMeme() {
         },
       });
       setDescription(response.data.description);
+      setExtractedText(response.data.extracted_text);
     } catch (error) {
-      console.error('Error getting description:', error);
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        console.error('Response data:', error.response.data);
-        console.error('Response status:', error.response.status);
-        console.error('Response headers:', error.response.headers);
-      } else if (error.request) {
-        // The request was made but no response was received
-        console.error('No response received:', error.request);
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        console.error('Error message:', error.message);
-      }
-      alert('Failed to get description. Please try again.');
+      console.error('Error getting description and text:', error);
+      alert('Failed to get description and text. Please try again.');
     }
   };
 
@@ -58,6 +47,7 @@ function UploadMeme() {
     const formData = new FormData();
     formData.append('image', file);
     formData.append('description', description);
+    formData.append('extracted_text', extractedText);
     try {
       const response = await axios.post('http://localhost:3001/memes', formData, {
         headers: {
@@ -79,15 +69,28 @@ function UploadMeme() {
       <input type="file" accept="image/*" onChange={handleFileChange} />
       {previewUrl && <img src={previewUrl} alt="Preview" style={{ maxWidth: '300px', marginTop: '10px' }} />}
       <br />
-      <button onClick={getDescription}>Get Description</button>
+      <button onClick={getDescriptionAndText}>Get Description and Text</button>
       <br />
-      <textarea
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        placeholder="Meme description"
-        rows="4"
-        cols="50"
-      />
+      <div>
+        <h3>Description:</h3>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Meme description"
+          rows="4"
+          cols="50"
+        />
+      </div>
+      <div>
+        <h3>Extracted Text:</h3>
+        <textarea
+          value={extractedText}
+          onChange={(e) => setExtractedText(e.target.value)}
+          placeholder="Extracted text"
+          rows="4"
+          cols="50"
+        />
+      </div>
       <br />
       <button onClick={saveMeme}>Save Meme</button>
     </div>

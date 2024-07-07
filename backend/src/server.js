@@ -8,14 +8,16 @@ const { Meme, sequelize, Op } = require('./models');
 const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
+const e = require('express');
 
 
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 app.use(cors());
 app.use(bodyParser.json());
+
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -40,6 +42,7 @@ app.get('/memes', async (req, res) => {
         whereCondition = {
           [Op.or]: [
             { description: { [Op.iLike]: `%${search}%` } },
+            { extracted_text: { [Op.iLike]: `%${search}%` } },
           ]
         };
       }
@@ -78,12 +81,13 @@ app.post('/memes', upload.single('image'), async (req, res) => {
         return res.status(400).json({ error: 'No file uploaded' });
       }
   
-      const { description } = req.body;
+      const { description, extracted_text } = req.body;
       const imageUrl = `/uploads/${req.file.filename}`;
   
       const meme = await Meme.create({
         url: imageUrl,
         description,
+        extracted_text
       });
   
       res.status(201).json(meme);
@@ -102,7 +106,7 @@ app.post('/generate-description', upload.single('image'), async (req, res) => {
     try {
       const formData = new FormData();
       console.log('Uploaded file:', req.file);
-      formData.append('file', fs.createReadStream(req.file.path), {
+      formData.append('image', fs.createReadStream(req.file.path), {
         filename: req.file.originalname,
         contentType: req.file.mimetype,
       });
@@ -114,7 +118,8 @@ app.post('/generate-description', upload.single('image'), async (req, res) => {
       });
   
       const description = response.data.description;
-      res.json({ description });
+      const extracted_text = response.data.extracted_text;
+      res.json({ description, extracted_text });
     } catch (error) {
       console.error('Error generating description:', error);
       if (error.response) {
@@ -125,7 +130,6 @@ app.post('/generate-description', upload.single('image'), async (req, res) => {
     }
   });
 
-app.use('/uploads', express.static('uploads'));
 
 
 initializeDatabase().then(() => {

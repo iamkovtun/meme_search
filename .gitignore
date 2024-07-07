@@ -1,11 +1,10 @@
 # Ignore node_modules directories
 /backend/node_modules
-/meme-search-frontend/node_modules
+/frontend/node_modules
 
 # Ignore environment variable files
-/model/.env
+/ai-app/.env
 
 
 /backend/uploads/*
 /data/*
-

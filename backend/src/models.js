@@ -23,12 +23,12 @@ const Meme = sequelize.define('Meme', {
   description: {
     type: DataTypes.TEXT,
     allowNull: false
-  },
-  upload_date: {
-    type: DataTypes.DATE,
-    defaultValue: Sequelize.NOW
-  }
-}, {
+  },  
+  extracted_text: {
+    type: DataTypes.TEXT,
+    allowNull: false 
+  }},
+  {
   tableName: 'Memes',
   schema: 'meme'
 });
