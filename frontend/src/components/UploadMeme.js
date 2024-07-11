@@ -1,6 +1,81 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import styled from 'styled-components';
 import { getApiUrl } from '../api';
+
+const UploadContainer = styled.div`
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+`;
+
+const Title = styled.h2`
+  text-align: center;
+  color: #333;
+  margin-bottom: 1.5rem;
+`;
+
+const FileInput = styled.input`
+  display: none;
+`;
+
+const FileInputLabel = styled.label`
+  display: inline-block;
+  padding: 10px 15px;
+  background-color: #3498db;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #2980b9;
+  }
+`;
+
+const PreviewImage = styled.img`
+  max-width: 100%;
+  margin-top: 1rem;
+  border-radius: 4px;
+`;
+
+const Button = styled.button`
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-top: 1rem;
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #27ae60;
+  }
+`;
+
+const TextArea = styled.textarea`
+  width: 100%;
+  padding: 10px;
+  margin-top: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+`;
+
+const Section = styled.div`
+  margin-top: 1.5rem;
+`;
+
+const SectionTitle = styled.h3`
+  color: #333;
+  margin-bottom: 0.5rem;
+`;
 
 function UploadMeme() {
   const [file, setFile] = useState(null);
@@ -11,7 +86,6 @@ function UploadMeme() {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
-    // Create a preview URL for the selected image
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreviewUrl(reader.result);
@@ -65,36 +139,34 @@ function UploadMeme() {
   };
 
   return (
-    <div>
-      <h2>Upload Meme</h2>
-      <input type="file" accept="image/*" onChange={handleFileChange} />
-      {previewUrl && <img src={previewUrl} alt="Preview" style={{ maxWidth: '300px', marginTop: '10px' }} />}
-      <br />
-      <button onClick={getDescriptionAndText}>Get Description and Text</button>
-      <br />
-      <div>
-        <h3>Description:</h3>
-        <textarea
+    <UploadContainer>
+      <Title>Upload Meme</Title>
+      <FileInputLabel>
+        Choose File
+        <FileInput type="file" accept="image/*" onChange={handleFileChange} />
+      </FileInputLabel>
+      {previewUrl && <PreviewImage src={previewUrl} alt="Preview" />}
+      <Button onClick={getDescriptionAndText}>Get Description and Text</Button>
+      <Section>
+        <SectionTitle>Description:</SectionTitle>
+        <TextArea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Meme description"
           rows="4"
-          cols="50"
         />
-      </div>
-      <div>
-        <h3>Extracted Text:</h3>
-        <textarea
+      </Section>
+      <Section>
+        <SectionTitle>Extracted Text:</SectionTitle>
+        <TextArea
           value={extractedText}
           onChange={(e) => setExtractedText(e.target.value)}
           placeholder="Extracted text"
           rows="4"
-          cols="50"
         />
-      </div>
-      <br />
-      <button onClick={saveMeme}>Save Meme</button>
-    </div>
+      </Section>
+      <Button onClick={saveMeme}>Save Meme</Button>
+    </UploadContainer>
   );
 }
 
