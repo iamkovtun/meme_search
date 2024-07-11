@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { getApiUrl } from '../api';
 
 function UploadMeme() {
   const [file, setFile] = useState(null);
@@ -26,7 +27,7 @@ function UploadMeme() {
     const formData = new FormData();
     formData.append('image', file);
     try {
-      const response = await axios.post('http://localhost:3001/generate-description', formData, {
+      const response = await axios.post(`${getApiUrl()}/generate-description`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -49,7 +50,7 @@ function UploadMeme() {
     formData.append('description', description);
     formData.append('extracted_text', extractedText);
     try {
-      const response = await axios.post('http://localhost:3001/memes', formData, {
+      const response = await axios.post(`${getApiUrl()}/memes`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

@@ -11,7 +11,7 @@ COPY backend/package*.json ./
 RUN npm install
 COPY backend/ .
 
-FROM python:3.8
+FROM python:3.12.4
 WORKDIR /app
 
 # Copy and install Python requirements
@@ -27,16 +27,22 @@ COPY --from=build-frontend /app/frontend/build ./frontend/build
 # Copy backend
 COPY --from=build-backend /app/backend ./backend
 
-# Install Node.js
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
-RUN apt-get install -y nodejs
+# Install Node.js and npm
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get update && \
+    apt-get install -y nodejs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Verify Node.js and npm installation
+RUN node --version && npm --version
 
 # Install PM2 globally
 RUN npm install -g pm2
 
-# Copy root package.json
-COPY package.json .
+# Copy root package.json and ecosystem.config.js
+COPY package.json ecosystem.config.js ./
 
 EXPOSE 3000 3001 8000
 
-CMD ["pm2-runtime", "start", "package.json"]
+CMD ["pm2-runtime", "start", "ecosystem.config.js"]

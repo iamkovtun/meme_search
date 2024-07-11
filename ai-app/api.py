@@ -14,7 +14,8 @@ async def generate_description_endpoint(image: UploadFile = File(...)):
     
     description = generate_description(image)
     extracted_text = extract_text(image, timeout=10)  # 10-second timeout
-    
+    print("Description:", description)
+    print("Extracted text:", extracted_text)
     return {
         "description": description,
         "extracted_text": extracted_text

@@ -4,7 +4,6 @@ const { Sequelize, DataTypes, Op } = require('sequelize');
 const sequelize = new Sequelize('postgres', 'postgres', '1111', {
   host: 'localhost',
   dialect: 'postgres',
-  schema: 'meme',
   logging: console.log // This will log SQL queries to the console
 });
 
@@ -29,9 +28,9 @@ const Meme = sequelize.define('Meme', {
     allowNull: false 
   }},
   {
-  tableName: 'Memes',
-  schema: 'meme'
-});
+    tableName: 'Memes',
+    timestamps: false // Disable timestamps
+  });
 
 
 // Function to initialize the database
